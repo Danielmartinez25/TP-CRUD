@@ -35,19 +35,20 @@ const controller = {
 		// Do the magic
 		const {price,category,discount,description,name} = req.body;
 		const products = loadProducts();
+		let images = req.files.map(file => file.filename);
 		const newProduct = {
 			id : (products[products.length - 1].id + 1),
+			...req.body,
 			name : name.trim(),
 			description : description.trim(),
 			price : +price,
 			discount : +discount,
-			image : 'default-image.png',
+			images,
 			category
 		}
-		const productModify = {...products, newProduct}
+		const productModify = [...products, newProduct]
 		storeProducts(productModify);
 		return res.redirect('/');
-
 	},
 
 	// Update - Form to edit
@@ -85,8 +86,9 @@ const controller = {
 	// Delete - Delete one product from DB
 	destroy : (req, res) => {
 		// Do the magic
+		const {id} =  req.params;
 		const products = loadProducts();
-		const productModify = products.filter(product.id != +id);
+		const productModify = products.filter(product => product.id != +id);
 		storeProducts(productModify);
 		return res.redirect('/products');
 	}
